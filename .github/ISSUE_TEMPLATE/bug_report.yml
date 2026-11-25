@@ -1,0 +1,63 @@
+name: Bug report
+description: Something does not work as described in the README.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Never post your API key, VIN, license plate, GPS position or address.**
+        The diagnostics download (Settings → Devices & services → Škoda API → ⋮ → Download diagnostics) already removes them.
+  - type: input
+    id: version
+    attributes:
+      label: Integration version
+      placeholder: "0.8.0"
+    validations:
+      required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Home Assistant version
+      placeholder: "2026.11.2"
+    validations:
+      required: true
+  - type: input
+    id: vehicle
+    attributes:
+      label: Vehicle model and software version
+      placeholder: "Elroq, 5.6.4"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: Installation
+      options:
+        - HACS / Marketplace
+        - Manual (custom_components)
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: logs
+    attributes:
+      label: Log lines
+      description: Settings → System → Logs, filtered for `skoda_api_ha`. Remove any personal data first.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I attached the diagnostics download (drag the file into this issue), or explained why not.
+        - label: The post contains no API key, VIN, license plate, GPS position or address.
+          required: true

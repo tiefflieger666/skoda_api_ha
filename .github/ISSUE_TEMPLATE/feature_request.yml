@@ -1,0 +1,26 @@
+name: Feature request
+description: Suggest a new entity or function.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The integration can only offer what the MyŠkoda Public API provides
+        (see "Not available in the API" in the README). Each request to the API
+        counts against the quota of 20 per hour per vehicle.
+  - type: textarea
+    id: what
+    attributes:
+      label: What would you like, and why?
+    validations:
+      required: true
+  - type: input
+    id: api
+    attributes:
+      label: API field or operation (if known)
+      placeholder: "e.g. vehicle.charging.settings.maxChargeCurrentAc"
+  - type: input
+    id: vehicle
+    attributes:
+      label: Vehicle model and software version
+      placeholder: "Elroq, 5.6.4"

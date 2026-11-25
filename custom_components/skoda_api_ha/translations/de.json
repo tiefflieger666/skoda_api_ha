@@ -1,0 +1,537 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Škoda API",
+        "description": "Gib den API-Schlüssel aus der MyŠkoda-App und die FIN des Fahrzeugs ein. Die Prüfung des Schlüssels verbraucht eine Anfrage aus dem stündlichen API-Kontingent des Fahrzeugs.",
+        "data": {
+          "api_key": "API-Schlüssel",
+          "vin": "FIN",
+          "device_name_source": "Gerätename",
+          "charger_power_entity": "Leistungssensor der Wallbox (optional)"
+        },
+        "data_description": {
+          "api_key": "Der Schlüssel (X-API-Key) aus der MyŠkoda-App. Er läuft ab und muss rechtzeitig ersetzt werden.",
+          "vin": "Fahrzeug-Identifizierungsnummer, 17 Zeichen.",
+          "device_name_source": "Worauf der Gerätename und die Entitätsnamen basieren. Standard ist der Fahrzeugname, da Kennzeichen und FIN private Daten sind.",
+          "charger_power_entity": "Nur falls vorhanden: ein Sensor mit der aktuellen Leistung Ihrer eigenen Wallbox, in W. Er bestätigt Start und Stopp des Ladens schneller und ohne zusätzliche Anfragen. Sonst leer lassen; Befehle werden dann über die Škoda API bestätigt (nächste regelmäßige Aktualisierung)."
+        }
+      },
+      "reauth_confirm": {
+        "title": "Neuen API-Schlüssel eingeben",
+        "description": "Die Škoda API hat den aktuellen API-Schlüssel abgelehnt. Gib einen neuen Schlüssel aus der MyŠkoda-App ein.",
+        "data": {
+          "api_key": "API-Schlüssel"
+        }
+      },
+      "reconfigure": {
+        "title": "API-Schlüssel ersetzen",
+        "description": "Gib den neuen API-Schlüssel ein. Er wird gespeichert und bei der nächsten regulären Aktualisierung geprüft, der Wechsel verbraucht also keine zusätzliche Anfrage. Er ersetzt den aktuellen Schlüssel nur, wenn er zum selben Fahrzeug gehört und länger gültig ist; sonst bleibt der aktuelle Schlüssel und eine Reparaturmeldung nennt den Grund.",
+        "data": {
+          "api_key": "API-Schlüssel"
+        }
+      }
+    },
+    "error": {
+      "invalid_vin": "Die FIN muss 17 Zeichen haben (Buchstaben und Ziffern, ohne I, O und Q).",
+      "invalid_auth": "Der API-Schlüssel ist ungültig oder abgelaufen.",
+      "vehicle_not_covered": "Der API-Schlüssel gilt nicht für dieses Fahrzeug.",
+      "rate_limited": "Das API-Kontingent für dieses Fahrzeug ist aufgebraucht. Bitte später erneut versuchen.",
+      "cannot_connect": "Verbindung zur Škoda API fehlgeschlagen.",
+      "unexpected_response": "Die Škoda API hat eine unerwartete Antwort geliefert.",
+      "unknown": "Unerwarteter Fehler.",
+      "same_key": "Dieser Schlüssel wird bereits verwendet."
+    },
+    "abort": {
+      "already_configured": "Dieses Fahrzeug ist bereits eingerichtet.",
+      "reauth_successful": "Der API-Schlüssel wurde aktualisiert.",
+      "candidate_saved": "Der neue API-Schlüssel ist gespeichert. Er wird bei der nächsten regulären Aktualisierung geprüft und ersetzt den aktuellen Schlüssel, wenn er länger gültig ist."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Optionen",
+        "description": "Das API-Kontingent teilen sich alle Clients desselben Fahrzeugs. Halte eine Reserve für Befehle und manuelle Aktualisierungen frei.",
+        "data": {
+          "device_name_source": "Gerätename",
+          "polls_per_hour": "Regelmäßige Aktualisierungen pro Stunde",
+          "confirm_get": "Bestätigungsanfrage nach einem Befehl",
+          "charger_power_entity": "Leistungssensor der Wallbox (optional)",
+          "charger_active_w": "Ladeleistung: lädt ab (W)",
+          "charger_quiet_w": "Ladeleistung: inaktiv bis (W)"
+        },
+        "data_description": {
+          "device_name_source": "Ändert nur die Anzeigenamen. Entitäts-IDs und eindeutige IDs bleiben gleich.",
+          "polls_per_hour": "0 bis 20. Standard 12 (alle 5 Minuten), damit bleiben 8 Anfragen pro Stunde für Befehle und manuelle Aktualisierungen. 0: keine regulären Aktualisierungen (nur die Schaltfläche Aktualisieren und Befehle). Das Kontingent beträgt 20 Anfragen pro Stunde und Fahrzeug und wird mit jeder anderen App und jedem Werkzeug geteilt, das die API für dieses Fahrzeug nutzt. Ab 19 pro Stunde bleibt kein Kontingent für Befehle.",
+          "confirm_get": "Nach einem Befehl eine zusätzliche Anfrage zur Bestätigung senden. Sie entfällt, wenn sonst die Reserve des Kontingents aufgebraucht würde; dann bestätigt die nächste regelmäßige Aktualisierung (oder der Leistungssensor der Wallbox, falls eingerichtet) den Befehl.",
+          "charger_power_entity": "Nur falls vorhanden: ein Sensor mit der aktuellen Leistung Ihrer eigenen Wallbox, in W. Er bestätigt Start und Stopp des Ladens schneller und ohne zusätzliche Anfragen. Sonst leer lassen; Befehle werden dann über die Škoda API bestätigt (nächste regelmäßige Aktualisierung).",
+          "charger_active_w": "Nur mit einem Leistungssensor der Wallbox. Der Ladestart gilt als bestätigt, wenn die Wallbox mindestens diese Leistung 20 Sekunden lang liefert. Standard 500 W. Wähle einen Wert, den deine Wallbox beim Laden sicher überschreitet.",
+          "charger_quiet_w": "Nur mit einem Leistungssensor der Wallbox. Der Ladestopp gilt als bestätigt, wenn die Leistung 20 Sekunden lang höchstens diesen Wert hat. Standard 10 W. Wähle einen Wert über der Standby-Leistung deiner Wallbox. Muss kleiner als die Ladeschwelle sein."
+        }
+      }
+    },
+    "error": {
+      "charger_thresholds": "Die Schwelle für inaktiv muss kleiner als die Ladeschwelle sein."
+    }
+  },
+  "selector": {
+    "device_name_source": {
+      "options": {
+        "vehicle_name": "Fahrzeugname",
+        "license_plate": "Kennzeichen",
+        "vin": "FIN"
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "range": {
+        "name": "Reichweite"
+      },
+      "odometer": {
+        "name": "Kilometerstand"
+      },
+      "charging_state": {
+        "name": "Ladezustand",
+        "state": {
+          "connect_cable": "Kabel anschließen",
+          "charging": "Lädt",
+          "conserving": "Erhaltungsladung",
+          "ready_for_charging": "Bereit zum Laden",
+          "discharging": "Entlädt",
+          "charging_interrupted": "Laden unterbrochen"
+        }
+      },
+      "charge_type": {
+        "name": "Ladeart",
+        "state": {
+          "ac": "AC",
+          "dc": "DC",
+          "off": "Aus"
+        }
+      },
+      "charging_power": {
+        "name": "Ladeleistung"
+      },
+      "charging_rate": {
+        "name": "Ladegeschwindigkeit"
+      },
+      "remaining_charging_time": {
+        "name": "Verbleibende Ladezeit"
+      },
+      "fully_charged_at": {
+        "name": "Vollständig geladen um"
+      },
+      "battery_care_limit": {
+        "name": "Batterieschonung Ladegrenze"
+      },
+      "max_charge_current": {
+        "name": "Maximaler Ladestrom"
+      },
+      "climate_state": {
+        "name": "Klimatisierungsstatus",
+        "state": {
+          "off": "Aus",
+          "cooling": "Kühlen",
+          "heating": "Heizen",
+          "heating_auxiliary": "Standheizung",
+          "ventilation": "Lüftung",
+          "completed": "Abgeschlossen"
+        }
+      },
+      "climate_target_reached_at": {
+        "name": "Zieltemperatur erreicht um"
+      },
+      "charging_profile": {
+        "name": "Ladeprofil"
+      },
+      "next_charging_time": {
+        "name": "Nächste Ladezeit"
+      },
+      "parking_address": {
+        "name": "Parkadresse"
+      },
+      "status_captured_at": {
+        "name": "Status erfasst um"
+      },
+      "odometer_captured_at": {
+        "name": "Kilometerstand erfasst um"
+      },
+      "parking_position_captured_at": {
+        "name": "Parkposition erfasst um"
+      },
+      "climate_captured_at": {
+        "name": "Klimatisierung erfasst um"
+      },
+      "charging_captured_at": {
+        "name": "Laden erfasst um"
+      },
+      "charging_profiles_captured_at": {
+        "name": "Ladeprofile erfasst um"
+      },
+      "quota_limit": {
+        "name": "Kontingent-Limit"
+      },
+      "quota_remaining": {
+        "name": "Verbleibendes Kontingent"
+      },
+      "quota_reset": {
+        "name": "Kontingent-Zurücksetzung"
+      },
+      "quota_reserve": {
+        "name": "Kontingent-Reserve"
+      },
+      "regular_updates_left": {
+        "name": "Verbleibende reguläre Aktualisierungen"
+      },
+      "update_interval": {
+        "name": "Aktualisierungsintervall"
+      },
+      "effective_interval": {
+        "name": "Tatsächliches Aktualisierungsintervall"
+      },
+      "next_update": {
+        "name": "Nächste Aktualisierung"
+      },
+      "last_update": {
+        "name": "Letzte Aktualisierung"
+      },
+      "api_errors": {
+        "name": "API-Fehler"
+      },
+      "api_key_expires": {
+        "name": "API-Schlüssel läuft ab"
+      },
+      "api_key_change": {
+        "name": "API-Schlüsselwechsel",
+        "state": {
+          "none": "Keiner",
+          "pending": "Neuer Schlüssel wartet"
+        }
+      },
+      "last_command_charging": {
+        "name": "Letzter Ladebefehl",
+        "state": {
+          "accepted": "Angenommen",
+          "confirmed": "Bestätigt",
+          "not_confirmed": "Nicht bestätigt",
+          "rejected": "Abgelehnt",
+          "uncertain": "Unsicher",
+          "cleared": "Gelöscht"
+        }
+      },
+      "last_command_climate": {
+        "name": "Letzter Klimatisierungsbefehl",
+        "state": {
+          "accepted": "Angenommen",
+          "confirmed": "Bestätigt",
+          "not_confirmed": "Nicht bestätigt",
+          "rejected": "Abgelehnt",
+          "uncertain": "Unsicher",
+          "cleared": "Gelöscht"
+        }
+      },
+      "last_command_charge_mode": {
+        "name": "Letzter Lademodus-Befehl",
+        "state": {
+          "accepted": "Angenommen",
+          "confirmed": "Bestätigt",
+          "not_confirmed": "Nicht bestätigt",
+          "rejected": "Abgelehnt",
+          "uncertain": "Unsicher",
+          "cleared": "Gelöscht"
+        }
+      },
+      "last_command_charge_limit": {
+        "name": "Letzter Ladelimit-Befehl",
+        "state": {
+          "accepted": "Angenommen",
+          "confirmed": "Bestätigt",
+          "not_confirmed": "Nicht bestätigt",
+          "rejected": "Abgelehnt",
+          "uncertain": "Unsicher",
+          "cleared": "Gelöscht"
+        }
+      },
+      "last_command_profile": {
+        "name": "Letzter Profilbefehl",
+        "state": {
+          "accepted": "Angenommen",
+          "confirmed": "Bestätigt",
+          "not_confirmed": "Nicht bestätigt",
+          "rejected": "Abgelehnt",
+          "uncertain": "Unsicher",
+          "cleared": "Gelöscht"
+        }
+      }
+    },
+    "binary_sensor": {
+      "plug_connected": {
+        "name": "Ladekabel"
+      },
+      "plug_lock": {
+        "name": "Ladekabelverriegelung"
+      },
+      "battery_care_mode": {
+        "name": "Batterieschonung"
+      },
+      "in_saved_location": {
+        "name": "An gespeichertem Ort"
+      },
+      "locked": {
+        "name": "Fahrzeugverriegelung"
+      },
+      "doors_locked": {
+        "name": "Türverriegelung"
+      },
+      "doors": {
+        "name": "Türen"
+      },
+      "windows": {
+        "name": "Fenster"
+      },
+      "sunroof": {
+        "name": "Schiebedach"
+      },
+      "trunk": {
+        "name": "Kofferraum"
+      },
+      "bonnet": {
+        "name": "Motorhaube"
+      },
+      "lights": {
+        "name": "Licht"
+      },
+      "in_motion": {
+        "name": "In Bewegung"
+      },
+      "window_heating_front": {
+        "name": "Scheibenheizung vorne"
+      },
+      "window_heating_rear": {
+        "name": "Scheibenheizung hinten"
+      },
+      "climate_at_unlock": {
+        "name": "Klimatisierung beim Entriegeln"
+      },
+      "climate_without_external_power": {
+        "name": "Klimatisierung ohne externe Stromversorgung"
+      }
+    },
+    "device_tracker": {
+      "parking_position": {
+        "name": "Parkposition"
+      }
+    },
+    "button": {
+      "start_charging": {
+        "name": "Laden starten"
+      },
+      "stop_charging": {
+        "name": "Laden stoppen"
+      },
+      "refresh": {
+        "name": "Aktualisieren"
+      },
+      "clear_pending": {
+        "name": "Wartende Befehle löschen"
+      }
+    },
+    "climate": {
+      "climate": {
+        "name": "Klimatisierung"
+      }
+    },
+    "select": {
+      "charge_mode": {
+        "name": "Lademodus",
+        "state": {
+          "manual": "Manuell",
+          "timer": "Timer",
+          "timer_charging_with_climatisation": "Timer mit Klimatisierung",
+          "preferred_charging_times": "Bevorzugte Ladezeiten",
+          "only_own_current": "Nur eigener Strom",
+          "immediate_discharging": "Sofortiges Entladen",
+          "home_storage_charging": "Heimspeicher-Laden"
+        }
+      }
+    },
+    "number": {
+      "charge_limit": {
+        "name": "Ladelimit"
+      },
+      "profile_target_soc": {
+        "name": "Profil Ziel-Ladestand"
+      },
+      "profile_min_soc": {
+        "name": "Profil Mindest-Ladestand"
+      }
+    },
+    "switch": {
+      "reduced_current": {
+        "name": "Reduzierter Ladestrom"
+      },
+      "auto_unlock_plug": {
+        "name": "Ladekabel nach dem Laden entriegeln"
+      },
+      "charging_time_1": {
+        "name": "Ladezeit 1"
+      },
+      "charging_time_2": {
+        "name": "Ladezeit 2"
+      },
+      "charging_time_3": {
+        "name": "Ladezeit 3"
+      },
+      "charging_time_4": {
+        "name": "Ladezeit 4"
+      },
+      "api_access": {
+        "name": "API-Zugriff"
+      },
+      "charging": {
+        "name": "Laden"
+      }
+    },
+    "time": {
+      "charging_time_1_start": {
+        "name": "Ladezeit 1 Beginn"
+      },
+      "charging_time_2_start": {
+        "name": "Ladezeit 2 Beginn"
+      },
+      "charging_time_3_start": {
+        "name": "Ladezeit 3 Beginn"
+      },
+      "charging_time_4_start": {
+        "name": "Ladezeit 4 Beginn"
+      },
+      "charging_time_1_end": {
+        "name": "Ladezeit 1 Ende"
+      },
+      "charging_time_2_end": {
+        "name": "Ladezeit 2 Ende"
+      },
+      "charging_time_3_end": {
+        "name": "Ladezeit 3 Ende"
+      },
+      "charging_time_4_end": {
+        "name": "Ladezeit 4 Ende"
+      }
+    },
+    "image": {
+      "vehicle_image": {
+        "name": "Fahrzeugbild"
+      }
+    }
+  },
+  "exceptions": {
+    "auth_failed": {
+      "message": "Die Škoda API hat den API-Schlüssel abgelehnt."
+    },
+    "rate_limited": {
+      "message": "Das API-Kontingent für dieses Fahrzeug ist aufgebraucht."
+    },
+    "update_failed": {
+      "message": "Die Aktualisierung der Fahrzeugdaten ist fehlgeschlagen ({error})."
+    },
+    "quota_wait": {
+      "message": "Warten auf das API-Kontingent dieses Fahrzeugs (nächste Anfrage in {seconds} s)."
+    },
+    "command_busy": {
+      "message": "Ein anderer Befehl für dieses Fahrzeug wird noch gesendet. Bitte gleich erneut versuchen."
+    },
+    "command_no_data": {
+      "message": "Noch keine Fahrzeugdaten. Warte auf die erste Aktualisierung."
+    },
+    "command_not_supported": {
+      "message": "Laut der letzten Aktualisierung bietet das Fahrzeug diesen Befehl ({operation}) nicht an."
+    },
+    "command_invalid_value": {
+      "message": "Dieser Wert ist für diesen Befehl nicht erlaubt."
+    },
+    "command_no_location_profile": {
+      "message": "Das Fahrzeug steht nicht an einem Ort mit gespeichertem Ladeprofil."
+    },
+    "command_profile_incomplete": {
+      "message": "Das Ladeprofil in der letzten Aktualisierung ist unvollständig. Warte auf die nächste Aktualisierung."
+    },
+    "command_no_preferred_time": {
+      "message": "Das Ladeprofil hat keine bevorzugte Ladezeit {slot}."
+    },
+    "command_rate_limited": {
+      "message": "Das API-Kontingent für dieses Fahrzeug ist aufgebraucht. Bitte später erneut versuchen."
+    },
+    "command_too_soon": {
+      "message": "Die letzte Anfrage an die Škoda API liegt weniger als 5 Sekunden zurück. Bitte gleich erneut versuchen."
+    },
+    "command_debounced": {
+      "message": "Derselbe Befehl wurde vor weniger als 25 Sekunden gesendet."
+    },
+    "command_data_too_old": {
+      "message": "Die letzte Aktualisierung ist zu alt, um diese Änderung daraus zu erstellen. Warte auf die nächste reguläre Aktualisierung."
+    },
+    "command_previous_not_visible": {
+      "message": "Die vorherige Änderung dieser Einstellung ist noch in keiner Aktualisierung sichtbar. Warte auf die nächste reguläre Aktualisierung."
+    },
+    "command_quota_reserve": {
+      "message": "Nicht gesendet: Das API-Kontingent muss genug Anfragen für jede reguläre Aktualisierung bis zum Zurücksetzen um {reset} behalten, plus eine als Reserve ({remaining} Anfragen übrig). Kein Kontingent – nutze die offizielle Škoda-App."
+    },
+    "command_auth_failed": {
+      "message": "Die Škoda API hat den API-Schlüssel abgelehnt. Gib einen neuen Schlüssel ein."
+    },
+    "command_uncertain": {
+      "message": "Die Škoda API hat nicht eindeutig geantwortet. Der Befehl wurde eventuell ausgeführt; er wird nicht erneut gesendet. Die nächste Aktualisierung zeigt das Ergebnis."
+    },
+    "command_vehicle_busy": {
+      "message": "Das Fahrzeug nimmt gerade keine Anfragen an (es begrenzt, wie oft es Befehle annimmt, oder die Batterie ist zu schwach). Versuchen Sie es später erneut."
+    },
+    "command_rejected": {
+      "message": "Die Škoda API hat den Befehl abgelehnt ({error})."
+    },
+    "command_refresh_reserve": {
+      "message": "Nicht aktualisiert: Die nächste reguläre Aktualisierung ist noch nicht fällig, und eine zusätzliche Anfrage würde die letzte Anfrage in Reserve verbrauchen. Die Daten werden mit der nächsten regulären Aktualisierung erneuert."
+    },
+    "command_refresh_failed": {
+      "message": "Die Aktualisierung ist fehlgeschlagen. Die Škoda API hat nicht oder mit einem Fehler geantwortet."
+    },
+    "command_api_disabled": {
+      "message": "Nicht gesendet: Der API-Zugriff ist für dieses Fahrzeug ausgeschaltet. Schalten Sie zuerst den Schalter API-Zugriff ein."
+    },
+    "api_disabled": {
+      "message": "Der API-Zugriff ist ausgeschaltet; es wurden noch keine Daten geladen."
+    },
+    "command_pending": {
+      "message": "Nicht gesendet: Der vorherige Befehl dieser Art wartet noch auf die Bestätigung durch die nächste Fahrzeugaktualisierung (Sanduhr-Symbol). Sende einen neuen Befehl nach dieser Aktualisierung. Nur ein Stopp darf einem wartenden Start sofort folgen."
+    },
+    "climate_temperature_confirm": {
+      "message": "Die Klimatisierung läuft: {temperature} °C werden jetzt mit einer Anfrage aus dem API-Kontingent gesendet ({remaining} Anfragen übrig bis {reset}, davon {spare} frei für Befehle). Stelle innerhalb von {seconds} s erneut {temperature} °C ein, um sie zu senden."
+    },
+    "climate_temperature_confirm_start": {
+      "message": "Die Klimatisierung ist aus. Die API kann eine Temperatur nur mit einem Start senden: {temperature} °C starten die Klimatisierung jetzt mit einer Anfrage aus dem API-Kontingent ({remaining} Anfragen übrig bis {reset}, davon {spare} frei für Befehle). Stelle innerhalb von {seconds} s erneut {temperature} °C ein, um sie zu starten."
+    }
+  },
+  "issues": {
+    "key_rejected_auth": {
+      "title": "Neuer API-Schlüssel abgelehnt",
+      "description": "Die Škoda API hat den neuen API-Schlüssel abgelehnt (ungültig, abgelaufen oder nicht für dieses Fahrzeug). Der aktuelle Schlüssel bleibt in Verwendung. Ersetze den Schlüssel erneut unter Einstellungen → Geräte & Dienste → Škoda API → Neu konfigurieren."
+    },
+    "key_rejected_vin_mismatch": {
+      "title": "Neuer API-Schlüssel abgelehnt",
+      "description": "Der neue API-Schlüssel hat für ein anderes Fahrzeug geantwortet. Der aktuelle Schlüssel bleibt in Verwendung. Gib den Schlüssel für dieses Fahrzeug unter Einstellungen → Geräte & Dienste → Škoda API → Neu konfigurieren ein."
+    },
+    "key_rejected_expired": {
+      "title": "Neuer API-Schlüssel abgelehnt",
+      "description": "Der neue API-Schlüssel ist bereits abgelaufen. Der aktuelle Schlüssel bleibt in Verwendung. Gib einen gültigen Schlüssel unter Einstellungen → Geräte & Dienste → Škoda API → Neu konfigurieren ein."
+    },
+    "key_rejected_shorter_validity": {
+      "title": "Neuer API-Schlüssel abgelehnt",
+      "description": "Der neue API-Schlüssel läuft nicht später ab als der aktuelle. Der aktuelle Schlüssel bleibt in Verwendung. Gib einen länger gültigen Schlüssel unter Einstellungen → Geräte & Dienste → Škoda API → Neu konfigurieren ein."
+    },
+    "no_command_quota": {
+      "title": "Kein API-Kontingent für Befehle",
+      "description": "Mit {polls} regulären Aktualisierungen pro Stunde lässt das stündliche Kontingent des Fahrzeugs (20 Anfragen pro FIN) keine Reserve für Befehle und manuelle Aktualisierungen. Befehle werden abgelehnt (Laden stoppen nur, wenn eine Anfrage übrig ist). Wählen Sie unter Einstellungen → Geräte & Dienste → Škoda API → Konfigurieren weniger reguläre Aktualisierungen, um wieder Befehle zu verwenden."
+    }
+  }
+}

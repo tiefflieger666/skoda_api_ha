@@ -1,0 +1,314 @@
+{
+  "entity": {
+    "sensor": {
+      "range": {
+        "default": "mdi:car-electric"
+      },
+      "odometer": {
+        "default": "mdi:counter"
+      },
+      "charging_state": {
+        "default": "mdi:ev-station",
+        "state": {
+          "connect_cable": "mdi:power-plug-off-outline",
+          "charging": "mdi:battery-charging",
+          "conserving": "mdi:battery-heart-variant",
+          "ready_for_charging": "mdi:battery-clock",
+          "discharging": "mdi:battery-arrow-down",
+          "charging_interrupted": "mdi:battery-alert"
+        }
+      },
+      "charge_type": {
+        "default": "mdi:ev-plug-type2"
+      },
+      "charging_power": {
+        "default": "mdi:flash"
+      },
+      "charging_rate": {
+        "default": "mdi:speedometer"
+      },
+      "remaining_charging_time": {
+        "default": "mdi:timer-sand"
+      },
+      "fully_charged_at": {
+        "default": "mdi:battery-check"
+      },
+      "battery_care_limit": {
+        "default": "mdi:battery-heart"
+      },
+      "max_charge_current": {
+        "default": "mdi:current-ac"
+      },
+      "climate_state": {
+        "default": "mdi:air-conditioner",
+        "state": {
+          "off": "mdi:fan-off",
+          "cooling": "mdi:snowflake",
+          "heating": "mdi:fire",
+          "heating_auxiliary": "mdi:radiator",
+          "ventilation": "mdi:fan",
+          "completed": "mdi:check-circle-outline"
+        }
+      },
+      "climate_target_reached_at": {
+        "default": "mdi:thermometer-check"
+      },
+      "charging_profile": {
+        "default": "mdi:map-marker-radius"
+      },
+      "next_charging_time": {
+        "default": "mdi:clock-start"
+      },
+      "parking_address": {
+        "default": "mdi:map-marker"
+      },
+      "status_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "odometer_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "parking_position_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "climate_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "charging_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "charging_profiles_captured_at": {
+        "default": "mdi:clock-check-outline"
+      },
+      "quota_limit": {
+        "default": "mdi:gauge-full"
+      },
+      "quota_remaining": {
+        "default": "mdi:gauge"
+      },
+      "quota_reset": {
+        "default": "mdi:timer-refresh-outline"
+      },
+      "quota_reserve": {
+        "default": "mdi:safe"
+      },
+      "regular_updates_left": {
+        "default": "mdi:counter"
+      },
+      "update_interval": {
+        "default": "mdi:timer-outline"
+      },
+      "effective_interval": {
+        "default": "mdi:timer-sand"
+      },
+      "next_update": {
+        "default": "mdi:update"
+      },
+      "last_update": {
+        "default": "mdi:history"
+      },
+      "api_errors": {
+        "default": "mdi:alert-circle-outline"
+      },
+      "api_key_expires": {
+        "default": "mdi:key-chain"
+      },
+      "api_key_change": {
+        "default": "mdi:key-change"
+      },
+      "last_command_charging": {
+        "default": "mdi:console-line"
+      },
+      "last_command_climate": {
+        "default": "mdi:console-line"
+      },
+      "last_command_charge_mode": {
+        "default": "mdi:console-line"
+      },
+      "last_command_charge_limit": {
+        "default": "mdi:console-line"
+      },
+      "last_command_profile": {
+        "default": "mdi:console-line"
+      }
+    },
+    "binary_sensor": {
+      "battery_care_mode": {
+        "default": "mdi:battery-heart-outline",
+        "state": {
+          "on": "mdi:battery-heart"
+        }
+      },
+      "in_saved_location": {
+        "default": "mdi:map-marker-off",
+        "state": {
+          "on": "mdi:home-map-marker"
+        }
+      },
+      "trunk": {
+        "default": "mdi:car-back",
+        "state": {
+          "on": "mdi:car-door"
+        }
+      },
+      "bonnet": {
+        "default": "mdi:car",
+        "state": {
+          "on": "mdi:car-lifted-pickup"
+        }
+      },
+      "window_heating_front": {
+        "default": "mdi:car-defrost-front"
+      },
+      "window_heating_rear": {
+        "default": "mdi:car-defrost-rear"
+      },
+      "climate_at_unlock": {
+        "default": "mdi:car-key"
+      },
+      "climate_without_external_power": {
+        "default": "mdi:power-plug-off",
+        "state": {
+          "on": "mdi:battery-arrow-down-outline"
+        }
+      },
+      "locked": {
+        "default": "mdi:car-key"
+      },
+      "doors_locked": {
+        "default": "mdi:car-door-lock",
+        "state": {
+          "on": "mdi:car-door-lock-open"
+        }
+      },
+      "doors": {
+        "default": "mdi:car-door"
+      },
+      "windows": {
+        "default": "mdi:car-windshield-outline",
+        "state": {
+          "on": "mdi:car-windshield"
+        }
+      },
+      "sunroof": {
+        "default": "mdi:car-convertible"
+      },
+      "lights": {
+        "default": "mdi:car-light-dimmed",
+        "state": {
+          "on": "mdi:car-light-high"
+        }
+      },
+      "plug_connected": {
+        "default": "mdi:power-plug-off-outline",
+        "state": {
+          "on": "mdi:ev-plug-type2"
+        }
+      },
+      "in_motion": {
+        "default": "mdi:car-brake-parking",
+        "state": {
+          "on": "mdi:car-arrow-right"
+        }
+      }
+    },
+    "device_tracker": {
+      "parking_position": {
+        "default": "mdi:car-brake-parking"
+      }
+    },
+    "button": {
+      "start_charging": {
+        "default": "mdi:play-circle-outline"
+      },
+      "stop_charging": {
+        "default": "mdi:stop-circle-outline"
+      },
+      "refresh": {
+        "default": "mdi:refresh"
+      },
+      "clear_pending": {
+        "default": "mdi:timer-sand-empty"
+      }
+    },
+    "select": {
+      "charge_mode": {
+        "default": "mdi:ev-station"
+      }
+    },
+    "number": {
+      "charge_limit": {
+        "default": "mdi:battery-arrow-up"
+      },
+      "profile_target_soc": {
+        "default": "mdi:battery-high"
+      },
+      "profile_min_soc": {
+        "default": "mdi:battery-low"
+      }
+    },
+    "switch": {
+      "reduced_current": {
+        "default": "mdi:current-ac"
+      },
+      "auto_unlock_plug": {
+        "default": "mdi:lock-open-variant-outline"
+      },
+      "charging_time_1": {
+        "default": "mdi:clock-outline"
+      },
+      "charging_time_2": {
+        "default": "mdi:clock-outline"
+      },
+      "charging_time_3": {
+        "default": "mdi:clock-outline"
+      },
+      "charging_time_4": {
+        "default": "mdi:clock-outline"
+      },
+      "api_access": {
+        "default": "mdi:cloud-sync-outline",
+        "state": {
+          "off": "mdi:cloud-off-outline"
+        }
+      },
+      "charging": {
+        "default": "mdi:ev-station",
+        "state": {
+          "on": "mdi:battery-charging"
+        }
+      }
+    },
+    "time": {
+      "charging_time_1_start": {
+        "default": "mdi:clock-start"
+      },
+      "charging_time_2_start": {
+        "default": "mdi:clock-start"
+      },
+      "charging_time_3_start": {
+        "default": "mdi:clock-start"
+      },
+      "charging_time_4_start": {
+        "default": "mdi:clock-start"
+      },
+      "charging_time_1_end": {
+        "default": "mdi:clock-end"
+      },
+      "charging_time_2_end": {
+        "default": "mdi:clock-end"
+      },
+      "charging_time_3_end": {
+        "default": "mdi:clock-end"
+      },
+      "charging_time_4_end": {
+        "default": "mdi:clock-end"
+      }
+    },
+    "image": {
+      "vehicle_image": {
+        "default": "mdi:car-side"
+      }
+    }
+  }
+}

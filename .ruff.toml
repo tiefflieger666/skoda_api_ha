@@ -1,0 +1,33 @@
+# Based on the .ruff.toml of ludeeus/integration_blueprint.
+target-version = "py314"
+
+[lint]
+select = ["ALL"]
+ignore = [
+    "ANN401", # Dynamically typed expressions (typing.Any) are disallowed
+    "D203",   # no-blank-line-before-class (incompatible with formatter)
+    "D213",   # multi-line-summary-second-line (HA style: summary on the first line)
+    "CPY001", # no copyright header in every file
+    "EM101",  # short literal messages in exceptions are fine
+    "EM102",
+    "TRY003",
+    "COM812", # incompatible with formatter
+    "ISC001", # incompatible with formatter
+]
+
+[lint.per-file-ignores]
+"tests/**" = [
+    "S101",    # assert is how pytest works
+    "PLR2004", # magic values in tests are fine
+    "SLF001",  # tests may look at private members
+    "ARG001",  # fixtures are often requested only for their side effect
+]
+
+[lint.flake8-pytest-style]
+fixture-parentheses = false
+
+[lint.pyupgrade]
+keep-runtime-typing = true
+
+[lint.mccabe]
+max-complexity = 25

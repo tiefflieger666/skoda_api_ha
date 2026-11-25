@@ -1,0 +1,5 @@
+# Pinned to the newest release for the target Home Assistant version.
+# pytest-homeassistant-custom-component 0.13.375 = homeassistant 2026.10.4
+# (no release for 2026.11.x yet; target is 2026.11.2, bump when available).
+pytest-homeassistant-custom-component==0.13.375
+pytest-cov==7.1.0

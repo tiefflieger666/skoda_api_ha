@@ -1,0 +1,15 @@
+{
+  "domain": "skoda_api_ha",
+  "name": "Škoda API",
+  "codeowners": ["@tiefflieger666"],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://github.com/tiefflieger666/skoda_api_ha",
+  "integration_type": "device",
+  "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/tiefflieger666/skoda_api_ha/issues",
+  "loggers": ["custom_components.skoda_api_ha"],
+  "requirements": [],
+  "single_config_entry": false,
+  "version": "0.11.1"
+}
